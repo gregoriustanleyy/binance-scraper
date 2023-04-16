@@ -85,17 +85,17 @@ def main_function(chat_id):
     sorted_by_volatility = sorted(token_data.items(), key=lambda x: x[1]['volatility'], reverse=True)
     sorted_by_ATR = sorted(token_data.items(), key=lambda x: x[1]['ATR'], reverse=True)
 
-    message = "Top 5 most volatile tokens:\n"
-    for i in range(5):
+    message = "Top 3 most volatile tokens:\n"
+    for i in range(3):
         token, data = sorted_by_volatility[i]
-        message += f"{token} VOLATILITY: {data['volatility']:.5f} ATR: {data['ATR']:.5f} ACTION: {data['action']}\n"
+        message += f"{token} Volatility: {data['volatility']:.5f} ATR: {data['ATR']:.5f} Action: {data['action']}\n"
 
-    message += "\nTop 5 tokens with the highest ATR:\n"
-    for i in range(5):
+    message += "\nTop 3 tokens with the highest ATR:\n"
+    for i in range(3):
         token, data = sorted_by_ATR[i]
-        message += f"{token} VOLATILITY: {data['volatility']:.5f} ATR: {data['ATR']:.5f} ACTION: {data['action']}\n"
+        message += f"{token} Volatility: {data['volatility']:.5f} ATR: {data['ATR']:.5f} Action: {data['action']}\n"
 
-    message += f"Program runtime: {time.time() - start:.2f} seconds"
+    message += f"\nProgram runtime: {time.time() - start:.2f} seconds"
 
     # Reset the standard output
     sys.stdout = old_stdout
