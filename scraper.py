@@ -118,7 +118,7 @@ def run_script_on_trigger(bot_token, trigger_message):
         sleep(1)
 
 # Set your bot token and trigger message
-trigger_message = "Run Python Script"
+trigger_message = "fetch binance data"
 bot_token = "6119013820:AAEqWzgHH4qnideh3hs9Mug3iGEzSYKZZ3k"
 
 run_script_on_trigger(bot_token, trigger_message)
