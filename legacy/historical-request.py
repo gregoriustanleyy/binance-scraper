@@ -30,8 +30,7 @@ def all_usdt_spot_pair():
     BASE_URL = 'https://api.binance.com'
     resp = requests.get(BASE_URL+'/api/v1/ticker/allBookTickers')
     ticker_list = json.loads(resp.content)
-    symbols = [i["symbol"]
-               for i in ticker_list if str(i['symbol'][-4:]) == 'USDT']
+    symbols = [i["symbol"] for i in ticker_list if str(i['symbol'][-4:]) == 'USDT']
     return symbols
 
 # get all FUTURES pair
@@ -39,8 +38,8 @@ def all_usdt_futures_pair():
     client = Client(api_key, api_secret)
     info = client.futures_exchange_info()
     temp = [i.get("symbol")[:-4] for i in info.get("symbols")]
-    temp.remove("BTCUSDT_22")
-    temp.remove("ETHUSDT_22")
+    # temp.remove("BTCUSDT_22")
+    # temp.remove("ETHUSDT_22")
     symbols = [str(i + "USDT") for i in set(temp)]
     return symbols
 
@@ -72,8 +71,8 @@ def calculate(data: np.ndarray):
     return data[0,0], last_price, pct_change, avg_trade, avg_vol, v_t, vlt
 
 # main function
-api_key = 'KVcT086rW4f2BM9or3bE4cgqC11MnvvKxQryeKx0n3HmkTfBGQwWAlVkcu1evttb'
-api_secret = '1goM6odH4ZQOXe5anVnFy5AD6HlXF8jfoeNUNWfNJbQo4dClyesAOdTmQstREh3w'
+api_key = 'gex1dgknEbsUPpc98goug6xjXdFSOyz8n0GsdA1j15WctlMf57SwQ61yBndP3Wft'
+api_secret = 'DtIoYwBlEAD2skWpmvRhZHJO52vJOI7bIqLH1tvp4W2HtlMnIk2c0iQStU1RME9o'
 interval = ['1s', '1m', '5m', '15m', '1h']
 
 spot = all_usdt_spot_pair()
