@@ -1,13 +1,22 @@
 import requests
 from time import sleep
-import io
-import sys
 import ccxt
 import time
 import pandas as pd
 import numpy as np
 import concurrent.futures
 from tqdm import tqdm
+import traceback
+
+def fetch_usdm_future_symbols(binance):
+    markets = binance.fapiPublicGetExchangeInfo()['symbols']
+    usdm_futures_symbols = [
+        market['symbol'] 
+        for market in markets
+        if market['contractType'] == 'PERPETUAL'
+    ]
+
+    return usdm_futures_symbols
 
 # Functions for sending messages and getting updates from Telegram
 def send_message(chat_id, text):
@@ -23,9 +32,6 @@ def get_updates(offset=None):
     return response.json()
 
 def main_function(chat_id):
-    # Redirect the standard output to a StringIO object
-    old_stdout = sys.stdout
-    sys.stdout = io.StringIO()
     start = time.time()
 
     def rogers_satchell_volatility(high, low, open, close):
@@ -70,12 +76,12 @@ def main_function(chat_id):
         'options': {'defaultType': 'future'},
     })
 
-    symbols = binance.load_markets()
-    token_data = {}
-    filtered_symbols = [symbol for symbol in symbols if 'USDT' in symbol and symbols[symbol]['future'] and not symbols[symbol]['inverse']]
+    symbols = fetch_usdm_future_symbols(binance)
 
+    token_data = {}
+    
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        results = list(tqdm(executor.map(fetch_token_data, filtered_symbols), total=len(filtered_symbols)))
+        results = list(tqdm(executor.map(fetch_token_data, symbols), total=len(symbols)))
 
     for result in results:
         symbol, data = result
@@ -86,39 +92,40 @@ def main_function(chat_id):
     sorted_by_ATR = sorted(token_data.items(), key=lambda x: x[1]['ATR'], reverse=True)
 
     message = "Top 3 most volatile tokens:\n"
-    for i in range(3):
+    for i in range(min(3, len(sorted_by_volatility))):
         token, data = sorted_by_volatility[i]
         message += f"{token} Volatility: {data['volatility']:.5f} ATR: {data['ATR']:.5f} Action: {data['action']}\n"
 
     message += "\nTop 3 tokens with the highest ATR:\n"
-    for i in range(3):
+    for i in range(min(3, len(sorted_by_ATR))):
         token, data = sorted_by_ATR[i]
         message += f"{token} Volatility: {data['volatility']:.5f} ATR: {data['ATR']:.5f} Action: {data['action']}\n"
 
     message += f"\nProgram runtime: {time.time() - start:.2f} seconds"
-
-    # Reset the standard output
-    sys.stdout = old_stdout
-
-    # Send the captured output to the Telegram chat
+    
     send_message(chat_id, message)
-
 
 # Function to run the main function on a trigger message
 def run_script_on_trigger(bot_token, trigger_message):
     update_id = None
     while True:
-        updates = get_updates(update_id)
-        for update in updates['result']:
-            message_text = update['message']['text']
-            chat_id = update['message']['chat']['id']
-            if message_text == trigger_message:
-                main_function(chat_id)
-            update_id = update['update_id'] + 1
+        try:
+            updates = get_updates(update_id)
+            for update in updates['result']:
+                message_text = update['message']['text']
+                chat_id = update['message']['chat']['id']
+                if message_text == trigger_message:
+                    main_function(chat_id)
+                update_id = update['update_id'] + 1
+        except Exception as e:
+            error_message = f"Error occurred:\n{traceback.format_exc()}"
+            send_message(default_chat_id, error_message)
+            continue
         sleep(1)
 
 # Set your bot token and trigger message
-trigger_message = "fetch binance data"
 bot_token = "6119013820:AAEqWzgHH4qnideh3hs9Mug3iGEzSYKZZ3k"
+trigger_message = "fetch binance dat"
+default_chat_id = 920877069
 
 run_script_on_trigger(bot_token, trigger_message)
