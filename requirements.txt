@@ -1,0 +1,5 @@
+requests==2.25.1
+pandas==1.2.4
+numpy==1.20.2
+ccxt==1.40.99
+tqdm==4.60.0
