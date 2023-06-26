@@ -125,7 +125,7 @@ def run_script_on_trigger(bot_token, trigger_message):
 
 # Set your bot token and trigger message
 bot_token = "6119013820:AAEqWzgHH4qnideh3hs9Mug3iGEzSYKZZ3k"
-trigger_message = "fetch binance dat"
+trigger_message = "fetch binance data"
 default_chat_id = 920877069
 
 run_script_on_trigger(bot_token, trigger_message)
