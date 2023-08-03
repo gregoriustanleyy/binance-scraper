@@ -112,10 +112,11 @@ def run_script_on_trigger(bot_token, trigger_message):
         try:
             updates = get_updates(update_id)
             for update in updates['result']:
-                message_text = update['message']['text']
-                chat_id = update['message']['chat']['id']
-                if message_text == trigger_message:
-                    main_function(chat_id)
+                if 'text' in update['message']:
+                    message_text = update['message']['text']
+                    chat_id = update['message']['chat']['id']
+                    if message_text == trigger_message:
+                        main_function(chat_id)
                 update_id = update['update_id'] + 1
         except Exception as e:
             error_message = f"Error occurred:\n{traceback.format_exc()}"
